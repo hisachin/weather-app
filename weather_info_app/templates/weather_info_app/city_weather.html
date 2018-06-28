@@ -1,0 +1,86 @@
+{% extends 'weather_info_app/index.html' %}
+
+{% block content %}
+    <h4 class="text-center">City Weather Forcast</h4>
+    <hr>
+    <section class="search_city">
+    	<div class="row">
+    		<div class="col-md-4 offset-md-4">
+    			<div class="input-group mb-3">
+				  	<input type="text" class="form-control" placeholder="Enter City" aria-label="City" aria-describedby="basic-addon2" id="city_name">
+				  	<div class="input-group-append">
+				    	<button class="btn btn-outline-success" type="button" id="get_city_weather_info">Get Info</button>
+				  	</div>
+				</div>
+    		</div>
+    	</div>
+    </section>
+    <section class="city_weather_data text-center" style="display: none;">
+    	<div class="weather_details">
+    		<h6> Weather Forcast For <strong class="black_color"><span id="weather_city"></span></strong></h6>
+    		<div class="weather_details">
+    			<div class="row">
+    				<div class="col-md-12">
+    					<h2 id="weather_headlines"></h2>
+    				</div>
+    				<div class="col-md-6">
+    					<p>	<strong class="black_color">Minimun Temperature</strong> 
+    						<span id="min_temp_value"></span> 
+    						<span id="min_temp_scale"></span> 
+    					</p>
+    				</div>
+    				<div class="col-md-6">
+    					<p>	<strong class="black_color">Maximum Temperature</strong> 
+    						<span id="max_temp_value"></span> 
+    						<span id="max_temp_scale"></span> 
+    					</p>
+    				</div>
+    				<div class="col-md-6">
+    					<p>	<strong class="black_color">Day Forcast</strong> 
+    						<span id="day_forcast"></span>
+    					</p>
+    				</div>
+    				<div class="col-md-6">
+    					<p>	<strong class="black_color">Night Forcast</strong> 
+    						<span id="night_forcast"></span>
+    					</p>
+    				</div>
+    			</div>
+    		</div>
+    	</div>
+    </section>
+    <script>
+    	$('#get_city_weather_info').on('click',function(){
+    		var city_name = $('#city_name').val();
+    		var btn_text = $('#get_city_weather_info').text();
+    		if(city_name){
+    			$('#get_city_weather_info').attr('disabled',true).html("<i class='fa fa-spinner fa-spin'></i>");
+    			$.ajax({
+				  	type: 'GET',
+				  	url: '/get_city_weather',
+				  	data: {'city_name':city_name},
+				  	dataType: 'json',
+				  	success: function(response){
+				  		$('#get_city_weather_info').attr('disabled',false).html(btn_text);
+				  		$('.city_weather_data').show();
+				  		if(response.status){
+				  			$('#weather_city').text(response.message.city);
+				  			$('#weather_headlines').text(response.message.headline);
+				  			$('#min_temp_value').text(response.message.min_temp.Value);
+				  			$('#min_temp_scale').text(response.message.min_temp.Unit);
+				  			$('#max_temp_value').text(response.message.max_temp.Value);
+				  			$('#max_temp_scale').text(response.message.max_temp.Unit);
+				  			$('#day_forcast').text(response.message.day_weather);
+				  			$('#night_forcast').text(response.message.night_weather);
+				  		}else{
+				  			alert(response.message);
+				  			$('.city_weather_data').hide();
+				  		}
+				  	}
+				});
+    		}else{
+    			alert('Please Enter City');
+    		}
+    	});
+    </script>
+{% endblock %}
